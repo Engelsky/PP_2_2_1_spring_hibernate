@@ -2,6 +2,7 @@ package hiber;
 
 import hiber.config.AppConfig;
 import hiber.model.User;
+import hiber.model.Car;
 import hiber.service.UserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -14,20 +15,34 @@ public class MainApp {
             new AnnotationConfigApplicationContext(AppConfig.class);
 
       UserService userService = context.getBean(UserService.class);
-
-      userService.add(new User("User1", "Lastname1", "user1@mail.ru"));
-      userService.add(new User("User2", "Lastname2", "user2@mail.ru"));
-      userService.add(new User("User3", "Lastname3", "user3@mail.ru"));
-      userService.add(new User("User4", "Lastname4", "user4@mail.ru"));
+      // вместе с пользователями добавлены их машины
+      userService.add(new User("User1", "Lastname1", "user1@mail.ru"
+              , new Car("Toyota", 80)));
+      userService.add(new User("User2", "Lastname2", "user2@mail.ru"
+              , new Car("BMW", 7)));
+      userService.add(new User("User3", "Lastname3", "user3@mail.ru"
+              , new Car("Audi", 6)));
+      userService.add(new User("User4", "Lastname4", "user4@mail.ru"
+              , new Car("Mersedez", 13)));
 
       List<User> users = userService.listUsers();
       for (User user : users) {
-         System.out.println("Id = "+user.getId());
-         System.out.println("First Name = "+user.getFirstName());
-         System.out.println("Last Name = "+user.getLastName());
-         System.out.println("Email = "+user.getEmail());
+         System.out.println("Id = " + user.getId());
+         System.out.println("First Name = " + user.getFirstName());
+         System.out.println("Last Name = " + user.getLastName());
+         System.out.println("Email = " + user.getEmail());
+
+         // добавлена печать машины
+         if(user.getCar() != null){
+             System.out.println("Car model = " + user.getCar().getModel());
+             System.out.println("Car series = " + user.getCar().getSeries());
+         }
          System.out.println();
       }
+      // поиск владельца по модели и серии
+      User owner = userService.findUserByCar("Toyota", 80);
+      System.out.println("Owner of Toyota 80:");
+      System.out.println(owner == null ? "null" : owner.getFirstName() + " " + owner.getLastName());
 
       context.close();
    }
